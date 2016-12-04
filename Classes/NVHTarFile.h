@@ -15,6 +15,6 @@
 - (void)createFilesAndDirectoriesAtPath:(NSString *)destinationPath completion:(void(^)(NSError*))completion;
 
 - (BOOL)packFilesAndDirectoriesAtPath:(NSString *)sourcePath error:(NSError **)error;
-- (void)packFilesAndDirectoriesAtPath:(NSString *)sourcePath completion:(void (^)(NSError *))completion;
+- (void)packFilesAndDirectoriesAtPath:(NSArray <NSString *> *)sourcePath completion:(void (^)(NSError *))completion;
 
 @end

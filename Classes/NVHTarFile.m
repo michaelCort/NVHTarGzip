@@ -341,13 +341,13 @@
 
 #pragma mark - Tar packing
 
-- (BOOL)packFilesAndDirectoriesAtPath:(NSString *)path error:(NSError **)error
+- (BOOL)packFilesAndDirectoriesAtPath:(NSArray <NSString *> *)path error:(NSError **)error
 {
     [self setupProgress];
     return [self innerPackFilesAndDirectoriesAtPath:path error:error];
 }
 
-- (void)packFilesAndDirectoriesAtPath:(NSString *)sourcePath completion:(void (^)(NSError *))completion {
+- (void)packFilesAndDirectoriesAtPath:(NSArray <NSString *> *)sourcePath completion:(void (^)(NSError *))completion {
     [self setupProgress];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         NSError* error = nil;
@@ -358,11 +358,11 @@
     });
 }
 
-- (BOOL)innerPackFilesAndDirectoriesAtPath:(NSString *)path error:(NSError **)error
+- (BOOL)innerPackFilesAndDirectoriesAtPath:(NSArray <NSString *> *)path error:(NSError **)error
 {
     NSFileManager *fileManager = [NSFileManager defaultManager];
     
-    if ([fileManager fileExistsAtPath:path]) {
+    if ([fileManager fileExistsAtPath:path.firstObject]) {
         [fileManager removeItemAtPath:self.filePath error:nil];
         [@"" writeToFile:self.filePath atomically:NO encoding:NSUTF8StringEncoding error:nil];
         NSFileHandle *fileHandle = [NSFileHandle fileHandleForWritingAtPath:self.filePath];
@@ -379,18 +379,15 @@
     return NO;
 }
 
-- (BOOL)packFilesAndDirectoriesAtPath:(NSString *)path withTarObject:(id)object size:(unsigned long long)size error:(NSError **)error
+- (BOOL)packFilesAndDirectoriesAtPath:(NSArray <NSString *> *)path withTarObject:(id)object size:(unsigned long long)size error:(NSError **)error
 {
     NSFileManager *fileManager = [NSFileManager defaultManager];
-    NSDirectoryEnumerator *directoryEnumerator = [fileManager enumeratorAtPath:path];
-    NSArray *directoryEnumeratorObjects = [directoryEnumerator allObjects];
-    [self updateProgressVirtualTotalUnitCount:[directoryEnumeratorObjects count]];
+    [self updateProgressVirtualTotalUnitCount:path.count];
     int currentVirtualTotalUnit = 0;
-    for (NSString *file in directoryEnumeratorObjects) {
+    for (NSString *file in path) {
         [self updateProgressVirtualCompletedUnitCount:currentVirtualTotalUnit];
         currentVirtualTotalUnit++;
         BOOL isDir = NO;
-        [fileManager fileExistsAtPath:[path stringByAppendingPathComponent:file] isDirectory:&isDir];
         NSData *tarContent = [self binaryEncodeDataForPath:file inDirectory:path isDirectory:isDir];
         [object writeData:tarContent];
     }

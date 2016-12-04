@@ -146,7 +146,7 @@
     }];
 }
 
-- (void)tarFileAtPath:(NSString *)sourcePath
+- (void)tarFileAtPath:(NSArray <NSString *> *)sourcePath
                toPath:(NSString *)destinationPath
            completion:(void(^)(NSError *))completion {
     NVHTarFile *tarFile = [[NVHTarFile alloc] initWithPath:destinationPath];
