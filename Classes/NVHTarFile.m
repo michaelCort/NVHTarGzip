@@ -379,15 +379,16 @@
     return NO;
 }
 
-- (BOOL)packFilesAndDirectoriesAtPath:(NSArray <NSString *> *)path withTarObject:(id)object size:(unsigned long long)size error:(NSError **)error
+- (BOOL)packFilesAndDirectoriesAtPath:(NSArray <NSString *> *)files withTarObject:(id)object size:(unsigned long long)size error:(NSError **)error
 {
     NSFileManager *fileManager = [NSFileManager defaultManager];
-    [self updateProgressVirtualTotalUnitCount:path.count];
+    [self updateProgressVirtualTotalUnitCount:0];
     int currentVirtualTotalUnit = 0;
-    for (NSString *file in path) {
+    for (NSString *file in files) {
         [self updateProgressVirtualCompletedUnitCount:currentVirtualTotalUnit];
         currentVirtualTotalUnit++;
         BOOL isDir = NO;
+        NSString *path = [file stringByDeletingLastPathComponent];
         NSData *tarContent = [self binaryEncodeDataForPath:file inDirectory:path isDirectory:isDir];
         [object writeData:tarContent];
     }
